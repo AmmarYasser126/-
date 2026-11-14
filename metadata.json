@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Tahfeeth Tracker — (تحفيظ)جامع الوالدين",
+  "description": "تطبيق متابعة الحفظ والمراجعة لحلقات تحفيظ القرآن الكريم بجامع الوالدين مع إشعارات آلية لأولياء الأمور",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

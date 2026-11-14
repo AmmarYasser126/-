@@ -1,0 +1,171 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['id', 'fullName', 'passwordPin']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 200 &&
+        data.passwordPin is string && data.passwordPin.size() >= 1 && data.passwordPin.size() <= 64 &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 200)) &&
+        (!('rawPhoneNumber' in data) || (data.rawPhoneNumber is string && data.rawPhoneNumber.size() <= 32)) &&
+        (!('studentPhone' in data) || (data.studentPhone is string && data.studentPhone.size() <= 32)) &&
+        (!('grade' in data) || (data.grade is string && data.grade.size() <= 100)) &&
+        (!('halaqahId' in data) || (data.halaqahId is string && data.halaqahId.size() <= 128)) &&
+        (!('halaqahName' in data) || (data.halaqahName is string && data.halaqahName.size() <= 200));
+    }
+
+    function isValidTeacher(data) {
+      return data.keys().hasAll(['id', 'name', 'phoneNumber']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 200 &&
+        data.phoneNumber is string && data.phoneNumber.size() <= 32 &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 200)) &&
+        (!('passwordPin' in data) || (data.passwordPin is string && data.passwordPin.size() <= 64)) &&
+        (!('halaqahId' in data) || (data.halaqahId is string && data.halaqahId.size() <= 128)) &&
+        (!('halaqahName' in data) || (data.halaqahName is string && data.halaqahName.size() <= 200));
+    }
+
+    function isValidHalaqah(data) {
+      return data.keys().hasAll(['id', 'name']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 200 &&
+        (!('teacherName' in data) || (data.teacherName is string && data.teacherName.size() <= 200)) &&
+        (!('teacherPhone' in data) || (data.teacherPhone is string && data.teacherPhone.size() <= 32)) &&
+        (!('teacherEmail' in data) || (data.teacherEmail is string && data.teacherEmail.size() <= 200));
+    }
+
+    function isValidParent(data) {
+      return data.keys().hasAll(['phoneNumber', 'createdAt']) &&
+        data.phoneNumber is string && data.phoneNumber.size() >= 1 && data.phoneNumber.size() <= 32 &&
+        data.createdAt is string && data.createdAt.size() <= 64 &&
+        (!('name' in data) || (data.name is string && data.name.size() <= 200)) &&
+        (!('passwordPin' in data) || (data.passwordPin is string && data.passwordPin.size() <= 64));
+    }
+
+    function isValidLog(data) {
+      return data.keys().hasAll(['id', 'studentId', 'type', 'date']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.studentId is string && data.studentId.size() >= 1 && data.studentId.size() <= 128 &&
+        data.type is string && data.type in ['hifz', 'murajaah', 'combined'] &&
+        data.date is string && data.date.size() <= 32 &&
+        (!('studentName' in data) || (data.studentName is string && data.studentName.size() <= 200)) &&
+        (!('surahName' in data) || (data.surahName is string && data.surahName.size() <= 200)) &&
+        (!('teacherNotes' in data) || (data.teacherNotes is string && data.teacherNotes.size() <= 1000));
+    }
+
+    function isValidAttendance(data) {
+      return data.keys().hasAll(['id', 'studentId', 'date', 'status']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.studentId is string && data.studentId.size() >= 1 && data.studentId.size() <= 128 &&
+        data.date is string && data.date.size() <= 32 &&
+        data.status is string && data.status in ['present', 'absent', 'late', 'excused'] &&
+        (!('studentName' in data) || (data.studentName is string && data.studentName.size() <= 200)) &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 500));
+    }
+
+    function isValidAdminSettings(data) {
+      return data.keys().hasAll(['mosqueName']) &&
+        data.mosqueName is string && data.mosqueName.size() >= 1 && data.mosqueName.size() <= 200 &&
+        (!('adminContactPhone' in data) || (data.adminContactPhone is string && data.adminContactPhone.size() <= 32)) &&
+        (!('officialSenderPhone' in data) || (data.officialSenderPhone is string && data.officialSenderPhone.size() <= 32)) &&
+        (!('defaultPasscode' in data) || (data.defaultPasscode is string && data.defaultPasscode.size() <= 64)) &&
+        (!('customFooterNote' in data) || (data.customFooterNote is string && data.customFooterNote.size() <= 500));
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['id', 'senderId', 'senderRole', 'studentId', 'teacherId', 'text', 'createdAt']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.senderId is string && data.senderId.size() <= 128 &&
+        data.senderRole is string && data.senderRole in ['student', 'teacher'] &&
+        data.studentId is string && data.studentId.size() <= 128 &&
+        data.teacherId is string && data.teacherId.size() <= 128 &&
+        data.text is string && data.text.size() >= 1 && data.text.size() <= 2000 &&
+        data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidParentVerification(data) {
+      return data.keys().hasAll(['phoneNumber', 'pin', 'expiresAt']) &&
+        data.phoneNumber is string && data.phoneNumber.size() >= 1 && data.phoneNumber.size() <= 32 &&
+        data.pin is string && data.pin.size() >= 1 && data.pin.size() <= 10 &&
+        data.expiresAt is string && data.expiresAt.size() <= 64;
+    }
+
+    match /test/{docId} {
+      allow get: if isValidId(docId);
+    }
+
+    match /students/{studentId} {
+      allow get: if isValidId(studentId);
+      allow list: if true;
+      allow create, update: if isValidId(studentId) && isValidStudent(incoming());
+      allow delete: if isValidId(studentId);
+    }
+
+    match /teachers/{teacherId} {
+      allow get: if isValidId(teacherId);
+      allow list: if true;
+      allow create, update: if isValidId(teacherId) && isValidTeacher(incoming());
+      allow delete: if isValidId(teacherId);
+    }
+
+    match /halaqat/{halaqahId} {
+      allow get: if isValidId(halaqahId);
+      allow list: if true;
+      allow create, update: if isValidId(halaqahId) && isValidHalaqah(incoming());
+      allow delete: if isValidId(halaqahId);
+    }
+
+    match /parents/{parentPhone} {
+      allow get: if isValidId(parentPhone);
+      allow list: if true;
+      allow create, update: if isValidId(parentPhone) && isValidParent(incoming());
+      allow delete: if isValidId(parentPhone);
+    }
+
+    match /logs/{logId} {
+      allow get: if isValidId(logId);
+      allow list: if true;
+      allow create, update: if isValidId(logId) && isValidLog(incoming());
+      allow delete: if isValidId(logId);
+    }
+
+    match /attendance/{attendanceId} {
+      allow get: if isValidId(attendanceId);
+      allow list: if true;
+      allow create, update: if isValidId(attendanceId) && isValidAttendance(incoming());
+      allow delete: if isValidId(attendanceId);
+    }
+
+    match /adminSettings/{settingId} {
+      allow get: if isValidId(settingId);
+      allow list: if true;
+      allow create, update: if isValidId(settingId) && isValidAdminSettings(incoming());
+    }
+
+    match /messages/{messageId} {
+      allow get: if isValidId(messageId);
+      allow list: if true;
+      allow create, update: if isValidId(messageId) && isValidMessage(incoming());
+      allow delete: if isValidId(messageId);
+    }
+
+    match /parentVerifications/{phone} {
+      allow get: if isValidId(phone);
+      allow create, update: if isValidId(phone) && isValidParentVerification(incoming());
+    }
+  }
+}
+

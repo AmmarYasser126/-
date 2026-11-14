@@ -1,0 +1,192 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Registered students in the Quran tahfeeth center",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fullName": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "email": { "type": "string", "maxLength": 200 },
+        "passwordPin": { "type": "string", "maxLength": 64 },
+        "rawPhoneNumber": { "type": "string", "maxLength": 32 },
+        "studentPhone": { "type": "string", "maxLength": 32 },
+        "grade": { "type": "string", "maxLength": 100 },
+        "gradeAssignedDate": { "type": "string", "maxLength": 64 },
+        "age": { "type": "number" },
+        "ageAssignedDate": { "type": "string", "maxLength": 64 },
+        "startSurah": { "type": "string", "enum": ["al-nas", "al-baqarah"] },
+        "lastSurahStoppedAt": { "type": "string", "maxLength": 100 },
+        "lastSurahNumber": { "type": "number" },
+        "registeredAt": { "type": "string", "maxLength": 64 },
+        "currentSurahNumber": { "type": "number" },
+        "halaqahId": { "type": "string", "maxLength": 128 },
+        "halaqahName": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["id", "fullName", "passwordPin"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Quran halaqah teachers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "email": { "type": "string", "maxLength": 200 },
+        "passwordPin": { "type": "string", "maxLength": 64 },
+        "phoneNumber": { "type": "string", "maxLength": 32 },
+        "halaqahId": { "type": "string", "maxLength": 128 },
+        "halaqahName": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name", "phoneNumber"]
+    },
+    "Halaqah": {
+      "title": "Halaqah",
+      "description": "Quran classes and circles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "teacherName": { "type": "string", "maxLength": 200 },
+        "teacherPhone": { "type": "string", "maxLength": 32 },
+        "teacherEmail": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name"]
+    },
+    "Parent": {
+      "title": "Parent",
+      "description": "Guardian profile linked by phone number",
+      "type": "object",
+      "properties": {
+        "phoneNumber": { "type": "string", "maxLength": 32 },
+        "name": { "type": "string", "maxLength": 200 },
+        "passwordPin": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["phoneNumber", "createdAt"]
+    },
+    "SessionLog": {
+      "title": "SessionLog",
+      "description": "Recitation, memorization, and review logs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 200 },
+        "type": { "type": "string", "enum": ["hifz", "murajaah", "combined"] },
+        "surahNumber": { "type": "number" },
+        "surahName": { "type": "string", "maxLength": 200 },
+        "startAyah": { "type": "number" },
+        "endAyah": { "type": "number" },
+        "ayahsCount": { "type": "number" },
+        "date": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "studentId", "type", "date"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily attendance records for students",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 200 },
+        "halaqahId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "enum": ["present", "absent", "late", "excused"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "studentId", "date", "status"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Mosque and center configuration",
+      "type": "object",
+      "properties": {
+        "mosqueName": { "type": "string", "maxLength": 200 },
+        "adminContactPhone": { "type": "string", "maxLength": 32 },
+        "officialSenderPhone": { "type": "string", "maxLength": 32 },
+        "defaultPasscode": { "type": "string", "maxLength": 64 },
+        "customFooterNote": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["mosqueName"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Direct chat messages between students and their halaqah teacher",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderId": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 200 },
+        "senderRole": { "type": "string", "enum": ["student", "teacher"] },
+        "recipientId": { "type": "string", "maxLength": 128 },
+        "recipientName": { "type": "string", "maxLength": 200 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "read": { "type": "boolean" }
+      },
+      "required": ["id", "senderId", "senderRole", "studentId", "teacherId", "text", "createdAt"]
+    },
+    "ParentVerification": {
+      "title": "ParentVerification",
+      "description": "One-time PIN verification records for guardian login",
+      "type": "object",
+      "properties": {
+        "phoneNumber": { "type": "string", "maxLength": 32 },
+        "intlPhone": { "type": "string", "maxLength": 32 },
+        "pin": { "type": "string", "maxLength": 10 },
+        "officialSenderPhone": { "type": "string", "maxLength": 32 },
+        "channel": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "expiresAt": { "type": "string", "maxLength": 64 },
+        "verified": { "type": "boolean" }
+      },
+      "required": ["phoneNumber", "pin", "expiresAt"]
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Registered students in the Quran tahfeeth center"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "Teacher",
+      "description": "Quran halaqah teachers"
+    },
+    "/halaqat/{halaqahId}": {
+      "schema": "Halaqah",
+      "description": "Quran classes and circles"
+    },
+    "/parents/{parentPhone}": {
+      "schema": "Parent",
+      "description": "Guardian profiles indexed by phone number"
+    },
+    "/logs/{logId}": {
+      "schema": "SessionLog",
+      "description": "Recitation, memorization, and review logs"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Daily attendance records for students"
+    },
+    "/adminSettings/{settingId}": {
+      "schema": "AdminSettings",
+      "description": "Mosque and center configuration"
+    },
+    "/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Direct chat messages between students and their halaqah teacher"
+    },
+    "/parentVerifications/{phone}": {
+      "schema": "ParentVerification",
+      "description": "One-time PIN verification records for guardian login"
+    }
+  }
+}
