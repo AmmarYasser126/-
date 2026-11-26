@@ -28,7 +28,7 @@
     "react-dom": "^19.0.1",
     "recharts": "^3.10.1",
     "tailwindcss": "^4.1.14",
-    "vite": "^6.2.3",
+    "vite": "^7.3.8",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
@@ -36,14 +36,15 @@
     "@types/html2canvas": "^1.0.0",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2"
   },
   "engines": {
-    "node": ">=20"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "overrides": {
-    "@grpc/grpc-js": "^1.14.7"
+    "@grpc/grpc-js": "^1.14.7",
+    "esbuild": "^0.28.1"
   }
 }
