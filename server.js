@@ -1,6 +1,10 @@
 // Production entry point (Hostinger "Entry file": server.js).
 // Serves the Vite build in dist/ and the /api/send-parent-pin endpoint.
-// If dist/ is missing (no build command configured on the host), it builds once at startup.
+// dist/ is normally built during `npm install` (postinstall). If it is still missing,
+// it builds once before listening.
+//
+// Note: Hostinger's launcher (lsnode.js) loads this file with require(), so this module
+// must not use top-level await.
 import 'dotenv/config';
 import express from 'express';
 import fs from 'node:fs';
@@ -12,7 +16,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, 'dist');
 const indexHtml = path.join(distDir, 'index.html');
 
-if (!fs.existsSync(indexHtml)) {
+async function ensureBuilt() {
+  if (fs.existsSync(indexHtml)) return;
   console.log('dist/ not found, running vite build...');
   const { build } = await import('vite');
   await build({ root: __dirname, logLevel: 'warn' });
@@ -50,7 +55,15 @@ app.get('*', (_req, res) => {
   res.sendFile(indexHtml);
 });
 
-const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+const port = process.env.PORT || 3000;
+
+ensureBuilt()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server listening on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to build the frontend:', err);
+    process.exit(1);
+  });
